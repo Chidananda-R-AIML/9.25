@@ -1,0 +1,157 @@
+
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mission 9.25 AI OS</title>
+<style>
+body{margin:0;background:#0b1020;color:#eef;font-family:Segoe UI}
+header{padding:30px;text-align:center;background:linear-gradient(90deg,#182848,#4b6cb7)}
+.container{max-width:1300px;margin:auto;padding:20px}
+.grid{display:grid;grid-template-columns:2fr 1fr;gap:20px}
+.card{background:#141c33;padding:18px;border-radius:18px;box-shadow:0 0 20px rgba(0,0,0,.3)}
+textarea,input{width:100%;padding:10px;border-radius:10px;background:#0d1326;color:white}
+button{padding:10px 18px;border-radius:10px;font-weight:bold;cursor:pointer}
+.progress{height:22px;background:#222;border-radius:20px}
+.fill{height:100%;width:0%;background:linear-gradient(90deg,#00c853,#64dd17)}
+table{width:100%;border-collapse:collapse}td,th{border-bottom:1px solid #2a3355;padding:8px}
+.check{margin:8px}
+</style></head>
+<body>
+<header><h1>🚀 Mission 9.25 CGPA AI Operating System</h1>
+<p>AI & ML | RRCE | Personal Exam Command Center</p></header>
+<div class="container">
+<div class="grid">
+<div>
+<div class="card">
+<h2>📅 AI Daily Planner</h2>
+<h3 id="today"></h3>
+<p id="focus"></p>
+<div id="tasks"></div>
+<div class="progress"><div class="fill" id="fill"></div></div>
+<h3 id="score"></h3>
+</div>
+
+<div class="card">
+<h2>🤖 AI Study Coach</h2>
+<textarea id="mood" rows="3" placeholder="How was your study today?"></textarea><br><br>
+<button onclick="coach()">Analyze My Day</button>
+<h3 id="coachout"></h3>
+</div>
+
+<div class="card">
+<h2>📝 AI Journal</h2>
+<textarea id="journal" rows="6"></textarea><br><br>
+<button onclick="saveJournal()">Save</button>
+</div>
+</div>
+
+<div>
+<div class="card">
+<h2>📊 Daily Analytics</h2>
+<table>
+<tr><td>Completion</td><td id="comp">0%</td></tr>
+<tr><td>Predicted Track</td><td id="track">Needs Work</td></tr>
+<tr><td>Estimated SGPA</td><td id="sg">8.50</td></tr>
+<tr><td>Current Streak</td><td id="streak">1</td></tr>
+</table>
+</div>
+
+<div class="card">
+<h2>🎯 Non-Negotiables</h2>
+<ul>
+<li>10 study hours</li>
+<li>25 numericals</li>
+<li>1 mock test</li>
+<li>1 PYQ set</li>
+<li>7 hours sleep</li>
+</ul>
+</div>
+
+<div class="card">
+<h2>🔥 Vision Board</h2>
+<p>Target First Year CGPA: <b>9.25+</b></p>
+<p>Become top AI & ML student.</p>
+<p>Build projects. Crack internships.</p>
+</div>
+</div>
+</div>
+</div>
+<script>
+const schedule={};
+schedule['2026-06-14']='Maths + EEE';
+schedule['2026-06-15']='Maths + EEE';
+schedule['2026-06-16']='Maths + EEE';
+schedule['2026-06-17']='Maths + EEE';
+schedule['2026-06-18']='Maths + EEE';
+schedule['2026-06-19']='Maths + EEE';
+schedule['2026-06-20']='Maths + EEE';
+schedule['2026-06-21']='Maths + EEE';
+schedule['2026-06-22']='Maths + EEE';
+schedule['2026-06-23']='Maths + EEE';
+schedule['2026-06-24']='Maths + EEE';
+schedule['2026-06-25']='Maths + EEE';
+schedule['2026-06-26']='Maths + EEE';
+schedule['2026-06-27']='Maths + EEE';
+schedule['2026-06-28']='Maths + EEE';
+schedule['2026-06-29']='Maths + EEE';
+schedule['2026-06-30']='Maths + EEE';
+schedule['2026-07-01']='Maths + EEE';
+schedule['2026-07-02']='Chemistry';
+schedule['2026-07-03']='Chemistry';
+schedule['2026-07-04']='Chemistry';
+schedule['2026-07-05']='AI';
+schedule['2026-07-06']='AI';
+schedule['2026-07-07']='AI';
+schedule['2026-07-08']='AI';
+schedule['2026-07-09']='EEE';
+schedule['2026-07-10']='EEE';
+schedule['2026-07-11']='Python + CIS';
+schedule['2026-07-12']='Python + CIS';
+schedule['2026-07-13']='Python + CIS';
+schedule['2026-07-14']='Communication';
+schedule['2026-07-15']='Communication';
+let now=new Date().toISOString().slice(0,10);
+today.innerHTML="Today: "+now;
+focus.innerHTML="Focus: "+(schedule[now]||"Exam Execution Day");
+const base=[
+"6-8 AM Deep Study",
+"9-11 AM Problem Solving",
+"PYQ Practice",
+"Core Subject",
+"Revision",
+"Mock Test",
+"25 Questions",
+"Formula Revision",
+"Exercise",
+"Sleep 7 Hours"];
+let div=document.getElementById("tasks");
+base.forEach((t,i)=>div.innerHTML+=`<div class='check'><input type='checkbox' class='c'> ${t}</div>`);
+let arr=[...document.querySelectorAll(".c")];
+let saved=JSON.parse(localStorage.getItem("aios")||"[]");
+arr.forEach((x,i)=>{x.checked=saved[i]||false;x.onchange=upd;});
+function upd(){
+let d=arr.filter(x=>x.checked).length;
+let p=Math.round(d/arr.length*100);
+fill.style.width=p+"%";
+score.innerHTML=p+"% Daily Completion";
+comp.innerHTML=p+"%";
+track.innerHTML=p>89?"9.25 CGPA Track":p>69?"Competitive":"Needs Work";
+sg.innerHTML=(8.5+(p/100)*1.5).toFixed(2);
+localStorage.setItem("aios",JSON.stringify(arr.map(x=>x.checked)));
+}
+upd();
+function coach(){
+let m=document.getElementById("mood").value.toLowerCase();
+let msg="";
+if(m.includes("tired")) msg="AI Coach: Reduce distractions and focus on one module for 90 minutes.";
+else if(m.includes("good")) msg="AI Coach: Momentum is high. Attempt a full mock test tonight.";
+else msg="AI Coach: Complete unchecked tasks before sleeping. Protect your EEE preparation.";
+coachout.innerHTML=msg;
+}
+function saveJournal(){
+localStorage.setItem("journal",journal.value);
+alert("Journal saved.");
+}
+journal.value=localStorage.getItem("journal")||"";
+</script>
+</body></html>

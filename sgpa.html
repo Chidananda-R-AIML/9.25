@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MISSION 10 SGPA — SEE Command</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --void:#05070f;--deep:#0d1120;--surface:#141829;--card:#1c2235;--card2:#232a3e;
+  --border:rgba(124,58,237,.18);
+  --violet:#7c3aed;--violet2:#a78bfa;--cyan:#06b6d4;--cyan2:#67e8f9;
+  --gold:#f59e0b;--gold2:#fcd34d;--green:#10b981;--red:#ef4444;--pink:#ec4899;
+  --text:#e2e8f0;--muted:#94a3b8;--dim:#4a5568;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Inter',sans-serif;background:var(--void);color:var(--text);min-height:100vh;overflow-x:hidden;}
+#stars{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+.star{position:absolute;background:white;border-radius:50%;animation:twinkle var(--d,3s) ease-in-out infinite;}
+@keyframes twinkle{0%,100%{opacity:.1}50%{opacity:var(--o,.8)}}
+.nebula{position:fixed;border-radius:50%;filter:blur(90px);pointer-events:none;z-index:0;}
+.n1{width:500px;height:500px;background:rgba(124,58,237,.06);top:-120px;right:-100px;}
+.n2{width:380px;height:380px;background:rgba(6,182,212,.05);bottom:-50px;left:-80px;}
+.n3{width:220px;height:220px;background:rgba(245,158,11,.04);top:45%;left:42%;}
+.app{position:relative;z-index:1;max-width:1400px;margin:0 auto;padding:0 1.5rem 4rem;}
+
+/* HEADER */
+.hdr{display:flex;align-items:center;justify-content:space-between;padding:1.4rem 0 .8rem;border-bottom:1px solid var(--border);}
+.logo{font-family:'Orbitron',monospace;font-weight:900;font-size:1.05rem;letter-spacing:.12em;color:var(--violet2);}
+.logo span{color:var(--cyan);}
+.hdr-sub{font-size:.62rem;color:var(--muted);margin-top:.2rem;font-family:'JetBrains Mono',monospace;}
+.hdr-right{text-align:right;}
+.tgt-lbl{font-family:'Orbitron',monospace;font-size:.68rem;color:var(--muted);letter-spacing:.1em;}
+.tgt-lbl strong{color:var(--gold);font-size:1.1rem;}
+.day-counter{font-size:.6rem;color:var(--dim);margin-top:.2rem;font-family:'JetBrains Mono',monospace;}
+
+/* TIMELINE */
+.tl-section{padding:.9rem 0 0;}
+.tl-lbl{font-size:.58rem;letter-spacing:.18em;color:var(--muted);text-transform:uppercase;margin-bottom:.5rem;font-family:'Orbitron',monospace;}
+.tl-scroll{display:flex;gap:5px;overflow-x:auto;padding-bottom:8px;scroll-behavior:smooth;scrollbar-width:thin;scrollbar-color:var(--violet) transparent;}
+.tl-scroll::-webkit-scrollbar{height:3px;}
+.tl-scroll::-webkit-scrollbar-thumb{background:var(--violet);border-radius:2px;}
+.day-node{flex-shrink:0;width:54px;text-align:center;cursor:pointer;transition:transform .2s;}
+.day-node:hover{transform:translateY(-2px);}
+.dot{width:38px;height:38px;border-radius:50%;border:2px solid var(--dim);background:var(--surface);margin:0 auto 3px;display:flex;align-items:center;justify-content:center;font-size:.62rem;font-family:'Orbitron',monospace;color:var(--muted);transition:all .2s;}
+.day-node.today .dot{border-color:var(--cyan);background:rgba(6,182,212,.15);color:var(--cyan);box-shadow:0 0 14px rgba(6,182,212,.45);}
+.day-node.active .dot{border-color:var(--violet);background:rgba(124,58,237,.2);color:var(--violet2);box-shadow:0 0 14px rgba(124,58,237,.45);}
+.day-node.done .dot{border-color:var(--green);background:rgba(16,185,129,.12);color:var(--green);}
+.dn-lbl{font-size:.5rem;color:var(--dim);line-height:1.3;}
+.day-node.today .dn-lbl,.day-node.active .dn-lbl{color:var(--muted);}
+.dn-type{font-size:.44rem;padding:1px 4px;border-radius:3px;margin-top:2px;display:inline-block;}
+.dt-study{background:rgba(124,58,237,.2);color:var(--violet2);}
+.dt-cram{background:rgba(245,158,11,.2);color:var(--gold);}
+.dt-rev{background:rgba(6,182,212,.15);color:var(--cyan2);}
+
+/* MAIN GRID */
+.main-grid{display:grid;grid-template-columns:1fr 365px;gap:1.1rem;margin-top:1.1rem;}
+@media(max-width:900px){.main-grid{grid-template-columns:1fr}}
+
+/* CARD */
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:1.1rem;}
+.card-title{font-family:'Orbitron',monospace;font-size:.63rem;letter-spacing:.13em;color:var(--muted);text-transform:uppercase;margin-bottom:.85rem;display:flex;align-items:center;gap:.45rem;}
+.da{width:6px;height:6px;border-radius:50%;background:var(--violet);flex-shrink:0;}
+.da.c{background:var(--cyan);}
+.da.g{background:var(--gold);}
+
+/* DAY HERO */
+.day-hero{background:linear-gradient(135deg,rgba(124,58,237,.1),rgba(6,182,212,.06));border:1px solid rgba(124,58,237,.22);border-radius:20px;padding:1.4rem;margin-bottom:1.1rem;position:relative;overflow:hidden;}
+.day-hero::before{content:'';position:absolute;top:-40px;right:-40px;width:150px;height:150px;border-radius:50%;background:radial-gradient(circle,rgba(124,58,237,.12),transparent 70%);}
+.hero-top{display:flex;justify-content:space-between;align-items:flex-start;}
+.day-num{font-family:'Orbitron',monospace;font-size:3rem;font-weight:900;line-height:1;color:var(--violet2);text-shadow:0 0 30px rgba(167,139,250,.28);}
+.day-num span{font-size:.88rem;color:var(--muted);}
+.hero-badges{display:flex;flex-direction:column;align-items:flex-end;gap:.4rem;}
+.deadline-chip{font-family:'Orbitron',monospace;font-size:.6rem;letter-spacing:.07em;padding:.28rem .75rem;border-radius:20px;border:1px solid var(--gold);color:var(--gold);background:rgba(245,158,11,.08);}
+.hero-date{font-size:.7rem;color:var(--muted);font-family:'JetBrains Mono',monospace;}
+.time-info{font-size:.62rem;color:var(--dim);font-family:'JetBrains Mono',monospace;}
+.hero-focus{margin-top:.9rem;}
+.fl{font-size:.58rem;letter-spacing:.12em;color:var(--muted);text-transform:uppercase;margin-bottom:.25rem;}
+.focus-subj{font-size:1.3rem;font-weight:700;color:var(--cyan);}
+.day-tag{display:inline-block;margin-top:.5rem;font-size:.6rem;padding:.22rem .65rem;border-radius:20px;font-family:'Orbitron',monospace;letter-spacing:.09em;}
+.t-s{background:rgba(124,58,237,.15);color:var(--violet2);border:1px solid rgba(124,58,237,.3);}
+.t-r{background:rgba(6,182,212,.12);color:var(--cyan2);border:1px solid rgba(6,182,212,.25);}
+.t-c{background:rgba(245,158,11,.15);color:var(--gold2);border:1px solid rgba(245,158,11,.3);}
+
+/* TIME BLOCKS */
+.blocks{display:flex;flex-direction:column;gap:.42rem;}
+.blk{display:flex;border-radius:11px;overflow:hidden;border:1px solid var(--border);background:var(--card2);}
+.blk-time{width:82px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:.45rem .4rem;background:rgba(0,0,0,.18);border-right:1px solid var(--border);}
+.blk-type-lbl{font-family:'Orbitron',monospace;font-size:.5rem;color:var(--muted);letter-spacing:.06em;}
+.blk-time-val{font-family:'JetBrains Mono',monospace;font-size:.68rem;color:var(--text);margin-top:.1rem;}
+.blk-body{flex:1;padding:.5rem .7rem;display:flex;align-items:center;gap:.55rem;}
+.blk-bar{width:3px;border-radius:2px;align-self:stretch;flex-shrink:0;}
+.blk-info{flex:1;}
+.blk-subj{font-size:.82rem;font-weight:600;}
+.blk-dur{font-family:'Orbitron',monospace;font-size:.56rem;color:var(--dim);margin-left:auto;padding-left:.5rem;flex-shrink:0;}
+.blk-xp{font-family:'Orbitron',monospace;font-size:.52rem;color:var(--gold);background:rgba(245,158,11,.1);padding:.1rem .32rem;border-radius:3px;margin-left:.2rem;flex-shrink:0;}
+.chk{width:22px;height:22px;border-radius:6px;border:2px solid var(--dim);flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;}
+.chk.done{background:var(--green);border-color:var(--green);}
+.chk.done::after{content:'✓';font-size:.75rem;color:white;font-weight:700;}
+
+/* XP BAR */
+.xp-wrap{margin-top:.85rem;}
+.xp-row{display:flex;justify-content:space-between;font-size:.67rem;color:var(--muted);margin-bottom:.25rem;}
+.xp-bar{height:5px;background:var(--card2);border-radius:3px;overflow:hidden;}
+.xp-fill{height:100%;background:linear-gradient(90deg,var(--violet),var(--cyan));border-radius:3px;transition:width .5s;}
+.streak{display:flex;align-items:center;gap:.4rem;font-family:'Orbitron',monospace;font-size:.68rem;color:var(--gold);margin-top:.5rem;}
+
+/* PROGRESS RING */
+.ring-wrap{display:flex;align-items:center;gap:1rem;}
+.ring-box{position:relative;width:100px;height:100px;flex-shrink:0;}
+.ring-box svg{transform:rotate(-90deg);}
+.rbg{fill:none;stroke:var(--card2);stroke-width:9;}
+.rfill{fill:none;stroke-width:9;stroke-linecap:round;transition:stroke-dashoffset .7s cubic-bezier(.4,0,.2,1);}
+.rc{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.ring-pct{font-family:'Orbitron',monospace;font-size:1.2rem;font-weight:700;color:var(--violet2);}
+.ring-sub{font-size:.5rem;color:var(--muted);}
+.ring-stats{flex:1;}
+.rs{display:flex;justify-content:space-between;align-items:center;padding:.3rem 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:.75rem;}
+.rs:last-child{border-bottom:none;}
+.rs-l{color:var(--muted);}
+.rs-v{font-family:'JetBrains Mono',monospace;font-weight:600;}
+
+/* SUBJECTS */
+.subj-grid{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;}
+.sc{background:var(--card2);border:1px solid var(--border);border-radius:11px;padding:.72rem;position:relative;overflow:hidden;}
+.sc::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--sc-c,var(--violet));border-radius:3px 0 0 3px;}
+.sc-pri{position:absolute;top:.5rem;right:.5rem;font-size:.5rem;font-family:'Orbitron',monospace;padding:.13rem .38rem;border-radius:4px;}
+.p1{background:rgba(239,68,68,.15);color:var(--red);}
+.p2{background:rgba(245,158,11,.15);color:var(--gold);}
+.p3{background:rgba(6,182,212,.12);color:var(--cyan);}
+.p4{background:rgba(16,185,129,.1);color:var(--green);}
+.p5{background:rgba(236,72,153,.1);color:var(--pink);}
+.sc-name{font-weight:600;font-size:.8rem;margin-bottom:.12rem;}
+.sc-cie{font-size:.63rem;color:var(--muted);font-family:'JetBrains Mono',monospace;}
+.sc-need{font-size:.6rem;margin-top:.18rem;font-family:'JetBrains Mono',monospace;}
+.sc-pbar{height:3px;background:var(--card);border-radius:2px;margin-top:.42rem;overflow:hidden;}
+.sc-pfill{height:100%;border-radius:2px;background:var(--sc-c,var(--violet));transition:width .4s;}
+
+/* POMODORO */
+.pomo-modes{display:flex;gap:.3rem;justify-content:center;margin-bottom:.55rem;}
+.pm-btn{padding:.28rem .6rem;border-radius:6px;border:1px solid var(--dim);background:transparent;color:var(--muted);font-size:.58rem;cursor:pointer;transition:all .2s;font-family:'Orbitron',monospace;}
+.pm-btn.active{background:rgba(6,182,212,.12);border-color:var(--cyan);color:var(--cyan);}
+.pomo-time{text-align:center;font-family:'Orbitron',monospace;font-size:2.3rem;font-weight:700;color:var(--cyan);letter-spacing:.05em;text-shadow:0 0 20px rgba(6,182,212,.25);}
+.pomo-btns{display:flex;gap:.45rem;justify-content:center;margin-top:.6rem;}
+.p-btn{padding:.43rem .9rem;background:var(--card2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'Orbitron',monospace;font-size:.58rem;cursor:pointer;transition:all .2s;letter-spacing:.08em;}
+.p-btn:hover{background:rgba(124,58,237,.15);border-color:var(--violet);}
+.p-btn.act{background:rgba(6,182,212,.15);border-color:var(--cyan);color:var(--cyan);}
+.pomo-sess{font-size:.63rem;color:var(--muted);text-align:center;margin-top:.45rem;}
+
+/* MARKS */
+.mk-table{width:100%;border-collapse:collapse;font-size:.73rem;}
+.mk-table th{font-size:.58rem;letter-spacing:.09em;color:var(--muted);text-transform:uppercase;padding:.42rem .45rem;text-align:left;border-bottom:1px solid var(--border);font-family:'Orbitron',monospace;}
+.mk-table td{padding:.42rem .45rem;border-bottom:1px solid rgba(255,255,255,.04);}
+.mk-table tr:last-child td{border-bottom:none;}
+.gp{display:inline-block;padding:.1rem .42rem;border-radius:5px;font-family:'Orbitron',monospace;font-size:.56rem;font-weight:700;}
+.gO{background:rgba(16,185,129,.15);color:#10b981;}
+.gA{background:rgba(6,182,212,.15);color:#06b6d4;}
+
+/* SGPA */
+.sgpa-big{font-family:'Orbitron',monospace;font-size:1.9rem;font-weight:900;text-align:center;background:linear-gradient(135deg,var(--violet2),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:.2rem;}
+.sgpa-note{font-size:.63rem;color:var(--muted);text-align:center;font-family:'JetBrains Mono',monospace;}
+.sgpa-bars{margin-top:.7rem;display:flex;flex-direction:column;gap:.4rem;}
+.sgb{display:flex;align-items:center;gap:.5rem;}
+.sgb-l{width:60px;font-size:.63rem;color:var(--muted);flex-shrink:0;}
+.sgb-t{flex:1;height:5px;background:var(--card2);border-radius:3px;overflow:hidden;}
+.sgb-f{height:100%;border-radius:3px;transition:width .5s;}
+.sgb-v{width:42px;text-align:right;font-family:'JetBrains Mono',monospace;font-size:.62rem;}
+
+/* TABS */
+.tabs{display:flex;gap:.28rem;margin-bottom:.85rem;background:var(--card2);border-radius:10px;padding:.25rem;}
+.tab-btn{flex:1;padding:.38rem;border:none;background:transparent;color:var(--muted);font-size:.58rem;border-radius:7px;cursor:pointer;transition:all .2s;font-family:'Orbitron',monospace;letter-spacing:.04em;}
+.tab-btn.active{background:var(--violet);color:white;}
+
+/* AI */
+.ai-top{display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem;}
+.ai-dot{width:8px;height:8px;border-radius:50%;background:linear-gradient(135deg,var(--violet),var(--cyan));animation:blink 2s ease-in-out infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.35}}
+.ai-nm{font-family:'Orbitron',monospace;font-size:.6rem;color:var(--violet2);letter-spacing:.1em;}
+.ai-box{padding:.78rem;background:rgba(124,58,237,.06);border:1px solid rgba(124,58,237,.18);border-radius:10px;font-size:.8rem;line-height:1.65;color:var(--text);min-height:34px;white-space:pre-wrap;}
+.ai-box.ld{color:var(--muted);font-style:italic;}
+.ai-row{display:flex;gap:.42rem;margin-top:.62rem;}
+.ai-inp{flex:1;background:var(--card2);border:1px solid var(--border);border-radius:9px;padding:.52rem .78rem;color:var(--text);font-family:'Inter',sans-serif;font-size:.8rem;outline:none;transition:border-color .2s;}
+.ai-inp:focus{border-color:var(--violet);}
+.ai-inp::placeholder{color:var(--dim);}
+.ai-send{padding:.52rem .88rem;background:linear-gradient(135deg,var(--violet),var(--cyan));border:none;border-radius:9px;color:white;font-family:'Orbitron',monospace;font-size:.58rem;cursor:pointer;transition:opacity .2s;white-space:nowrap;}
+.ai-send:hover{opacity:.85;}
+.ai-send:disabled{opacity:.4;cursor:not-allowed;}
+.ai-resp{margin-top:.62rem;padding:.78rem;background:rgba(6,182,212,.05);border:1px solid rgba(6,182,212,.15);border-radius:10px;font-size:.8rem;line-height:1.65;white-space:pre-wrap;display:none;}
+
+/* QUOTE */
+.qt-wrap{background:linear-gradient(135deg,rgba(124,58,237,.07),rgba(6,182,212,.04));border:1px solid rgba(124,58,237,.14);border-radius:12px;padding:.88rem;text-align:center;margin-top:.9rem;}
+.qt-t{font-size:.78rem;color:var(--text);line-height:1.6;font-style:italic;}
+.qt-a{font-size:.63rem;color:var(--muted);margin-top:.35rem;font-family:'JetBrains Mono',monospace;}
+
+/* IEE ALERT */
+.iee-alert{padding:.65rem .85rem;background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.22);border-radius:9px;font-size:.73rem;color:var(--red);margin-top:.8rem;line-height:1.5;}
+
+/* NOTIF */
+.notif{position:fixed;top:1.4rem;right:1.4rem;z-index:200;background:var(--card);border:1px solid var(--green);border-radius:12px;padding:.7rem 1.1rem;font-size:.76rem;color:var(--green);transform:translateY(-100px);opacity:0;transition:all .3s;font-family:'JetBrains Mono',monospace;pointer-events:none;}
+.notif.show{transform:translateY(0);opacity:1;}
+
+.sidebar{display:flex;flex-direction:column;gap:1rem;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.fu{animation:fadeUp .35s ease forwards;}
+</style>
+</head>
+<body>
+<div id="stars"></div>
+<div class="nebula n1"></div><div class="nebula n2"></div><div class="nebula n3"></div>
+<div class="notif" id="notif"></div>
+
+<div class="app">
+  <!-- HEADER -->
+  <div class="hdr">
+    <div>
+      <div class="logo">MISSION <span>10 SGPA</span> — SEE COMMAND</div>
+      <div class="hdr-sub">June 19 → June 30, 2025 · 12 Days Remaining · 12 hrs/day</div>
+    </div>
+    <div class="hdr-right">
+      <div class="tgt-lbl">TARGET SGPA <strong>10.0</strong></div>
+      <div class="day-counter" id="dayCounter">DAY — / 12</div>
+    </div>
+  </div>
+
+  <!-- TIMELINE -->
+  <div class="tl-section">
+    <div class="tl-lbl">⬡ Mission Timeline — Click Any Day to Navigate</div>
+    <div class="tl-scroll" id="tlScroll"></div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main-grid">
+    <!-- LEFT -->
+    <div>
+      <!-- HERO -->
+      <div class="day-hero fu">
+        <div class="hero-top">
+          <div>
+            <div style="font-size:.58rem;letter-spacing:.15em;color:var(--muted);font-family:'Orbitron',monospace;margin-bottom:.22rem;">MISSION LOG</div>
+            <div class="day-num">D<span id="heroDayNum">01</span></div>
+          </div>
+          <div class="hero-badges">
+            <div class="deadline-chip" id="deadlineChip">⌛ — DAYS TO JUNE 30</div>
+            <div class="hero-date" id="heroDate">—</div>
+            <div class="time-info">8AM–12PM · 1PM–5PM · 7PM–11PM</div>
+          </div>
+        </div>
+        <div class="hero-focus">
+          <div class="fl">Priority Order Today</div>
+          <div class="focus-subj">IEE → Chemistry → AI = Python → Maths → Comm (45m)</div>
+          <div style="margin-top:.5rem;"><span class="day-tag" id="dayTag">—</span></div>
+        </div>
+      </div>
+
+      <!-- TABS -->
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('schedule')">⏰ SCHEDULE</button>
+        <button class="tab-btn" onclick="switchTab('marks')">🎯 MARKS</button>
+        <button class="tab-btn" onclick="switchTab('sgpa')">📊 SGPA</button>
+      </div>
+
+      <!-- TAB: SCHEDULE -->
+      <div id="tab-schedule" class="card fu">
+        <div class="card-title"><span class="da"></span>Daily Time Blocks — 12 Hour War Plan</div>
+        <div class="blocks" id="blocksEl"></div>
+        <div class="xp-wrap">
+          <div class="xp-row"><span>Daily XP Progress</span><span id="xpLbl">0 / 0 XP</span></div>
+          <div class="xp-bar"><div class="xp-fill" id="xpFill" style="width:0%"></div></div>
+          <div class="streak">🔥 <span id="streakNum">0</span> day streak</div>
+        </div>
+      </div>
+
+      <!-- TAB: MARKS -->
+      <div id="tab-marks" class="card fu" style="display:none">
+        <div class="card-title"><span class="da g"></span>CIE Marks & Required SEE Marks for O Grade</div>
+        <table class="mk-table">
+          <thead><tr><th>Subject</th><th>CIE /50</th><th>Need SEE /50</th><th>Max Total</th><th>Best Grade</th></tr></thead>
+          <tbody id="marksBody"></tbody>
+        </table>
+        <div class="iee-alert">⚠️ IEE: CIE = 37/50. Even with perfect SEE (50/50), max total = 87%. Cannot reach O grade (90%+). Best achievable = A+ (9 GP). This is why IEE gets maximum daily time — don't lose a single mark.</div>
+      </div>
+
+      <!-- TAB: SGPA -->
+      <div id="tab-sgpa" class="card fu" style="display:none">
+        <div class="card-title"><span class="da"></span>Projected SGPA (Best Case)</div>
+        <div class="sgpa-big" id="sgpaVal">9.76</div>
+        <div class="sgpa-note" id="sgpaNote">Projected if you score 90%+ in all except IEE (A+ cap)</div>
+        <div class="sgpa-bars" id="sgpaBars"></div>
+        <div style="margin-top:.75rem;font-size:.7rem;color:var(--muted);font-family:'JetBrains Mono',monospace;padding:.55rem;background:var(--card2);border-radius:8px;">
+          Grade Scale: O = 10 GP (90%+) · A+ = 9 GP (80–89%) · A = 8 GP (70–79%) · B+ = 7 GP (60–69%)
+        </div>
+      </div>
+
+      <!-- AI COACH -->
+      <div class="card fu" style="margin-top:1rem;">
+        <div class="card-title"><span class="da"></span><span style="background:linear-gradient(135deg,var(--violet2),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;">AI Coach NOVA — Powered by Claude</span></div>
+        <div class="ai-top"><div class="ai-dot"></div><span class="ai-nm">NOVA · Your Personal Study Intelligence</span></div>
+        <div class="ai-box ld" id="aiWelcome">Initializing mission briefing...</div>
+        <div class="ai-row">
+          <input type="text" class="ai-inp" id="aiInp" placeholder="Ask Nova — IEE concepts, study strategy, motivation..."/>
+          <button class="ai-send" id="aiBtn" onclick="askNova()">ASK ↗</button>
+        </div>
+        <div class="ai-resp" id="aiResp"></div>
+      </div>
+    </div>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <!-- PROGRESS RING -->
+      <div class="card fu">
+        <div class="card-title"><span class="da"></span>Daily Completion</div>
+        <div class="ring-wrap">
+          <div class="ring-box">
+            <svg width="100" height="100" viewBox="0 0 100 100">
+              <circle class="rbg" cx="50" cy="50" r="40"/>
+              <circle class="rfill" id="ringEl" cx="50" cy="50" r="40"
+                stroke="url(#rg)" stroke-dasharray="251.3" stroke-dashoffset="251.3"/>
+              <defs><linearGradient id="rg" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#7c3aed"/><stop offset="100%" stop-color="#06b6d4"/>
+              </linearGradient></defs>
+            </svg>
+            <div class="rc">
+              <div class="ring-pct" id="ringPct">0%</div>
+              <div class="ring-sub">complete</div>
+            </div>
+          </div>
+          <div class="ring-stats">
+            <div class="rs"><span class="rs-l">Blocks done</span><span class="rs-v" id="psBlocks">0/0</span></div>
+            <div class="rs"><span class="rs-l">Hours studied</span><span class="rs-v" id="psHours">0h</span></div>
+            <div class="rs"><span class="rs-l">XP earned</span><span class="rs-v" style="color:var(--gold)" id="psXP">0</span></div>
+            <div class="rs"><span class="rs-l">Track</span><span class="rs-v" id="psTrack">—</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- POMODORO -->
+      <div class="card fu">
+        <div class="card-title"><span class="da c"></span>Focus Timer</div>
+        <div class="pomo-modes">
+          <button class="pm-btn active" onclick="setPomo(45,10,this)">45 MIN</button>
+          <button class="pm-btn" onclick="setPomo(25,5,this)">25 MIN</button>
+          <button class="pm-btn" onclick="setPomo(60,15,this)">60 MIN</button>
+        </div>
+        <div class="pomo-time" id="pomoTime">45:00</div>
+        <div class="pomo-btns">
+          <button class="p-btn" id="pomoStart" onclick="togglePomo()">START</button>
+          <button class="p-btn" onclick="resetPomo()">RESET</button>
+        </div>
+        <div class="pomo-sess">Sessions today: <span id="pomoSess">0</span> 🍅</div>
+      </div>
+
+      <!-- SUBJECTS STATUS -->
+      <div class="card fu">
+        <div class="card-title"><span class="da g"></span>Subjects — Priority & Status</div>
+        <div class="subj-grid" id="subjGrid"></div>
+      </div>
+
+      <!-- QUOTE -->
+      <div id="quoteEl"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// DATA
+// ============================================================
+const START = new Date('2025-06-19');
+const TOTAL  = 12; // June 19 to June 30 inclusive
+
+const SUBJS = [
+  { id:'IEE',  name:'IEE',           cie:37, color:'#ef4444', p:1, credits:4 },
+  { id:'CHEM', name:'Chemistry',      cie:48, color:'#f59e0b', p:2, credits:3 },
+  { id:'AI',   name:'Artificial Intel', cie:49, color:'#06b6d4', p:3, credits:3 },
+  { id:'PY',   name:'Python',         cie:49, color:'#a78bfa', p:3, credits:3 },
+  { id:'MATH', name:'Mathematics',    cie:47, color:'#10b981', p:4, credits:4 },
+  { id:'CS',   name:'Comm. Skills',   cie:49, color:'#ec4899', p:5, credits:2, cap:true },
+];
+
+// Colors map
+const SC = { IEE:'#ef4444',CHEM:'#f59e0b',AI:'#06b6d4',PY:'#a78bfa',MATH:'#10b981',CS:'#ec4899',BREAK:'#4a5568',PLAN:'#7c3aed' };
+const SN = { IEE:'IEE',CHEM:'Chemistry',AI:'Artificial Intel.',PY:'Python',MATH:'Mathematics',CS:'Comm. Skills',BREAK:'☕ Break',PLAN:'📋 Planning' };
+
+// Build schedule for a given day index (0 = June 19)
+function schedule(idx) {
+  const date = new Date(START);
+  date.setDate(START.getDate() + idx);
+  const dow = date.getDay(); // 0=Sun
+  const isSun = dow === 0;
+  const isCram = idx >= 9; // Last 3 days (June 28,29,30) = cram
+
+  if (isCram) {
+    return [
+      { time:'08:00–10:00', subj:'IEE',  dur:'2h',    xp:120, type:'CRAM' },
+      { time:'10:00–11:30', subj:'CHEM', dur:'90 min', xp:90,  type:'CRAM' },
+      { time:'11:30–12:00', subj:'CS',   dur:'30 min', xp:30,  type:'CRAM' },
+      { time:'01:00–02:30', subj:'AI',   dur:'90 min', xp:80,  type:'CRAM' },
+      { time:'02:30–04:00', subj:'PY',   dur:'90 min', xp:80,  type:'CRAM' },
+      { time:'04:00–05:00', subj:'MATH', dur:'1h',     xp:70,  type:'CRAM' },
+      { time:'07:00–08:30', subj:'IEE',  dur:'90 min', xp:100, type:'PYQ'  },
+      { time:'08:30–09:30', subj:'CHEM', dur:'1h',     xp:70,  type:'PYQ'  },
+      { time:'09:30–10:15', subj:'CS',   dur:'45 min', xp:35,  type:'FINAL'},
+      { time:'10:15–11:00', subj:'PLAN', dur:'45 min', xp:40,  type:'PLAN' },
+    ];
+  }
+
+  if (isSun) {
+    // Sunday = revision + PYQ day
+    return [
+      { time:'08:00–09:30', subj:'IEE',  dur:'90 min', xp:75, type:'REVISION' },
+      { time:'09:30–11:00', subj:'CHEM', dur:'90 min', xp:60, type:'REVISION' },
+      { time:'11:00–11:45', subj:'CS',   dur:'45 min', xp:30, type:'REVISION' },
+      { time:'11:45–12:00', subj:'BREAK',dur:'15 min', xp:0,  type:'BREAK'    },
+      { time:'01:00–02:30', subj:'AI',   dur:'90 min', xp:50, type:'REVISION' },
+      { time:'02:30–04:00', subj:'PY',   dur:'90 min', xp:50, type:'REVISION' },
+      { time:'04:00–05:00', subj:'MATH', dur:'1h',     xp:45, type:'REVISION' },
+      { time:'07:00–08:30', subj:'IEE',  dur:'90 min', xp:80, type:'PYQ'     },
+      { time:'08:30–09:30', subj:'CHEM', dur:'1h',     xp:60, type:'PYQ'     },
+      { time:'09:30–11:00', subj:'PLAN', dur:'90 min', xp:50, type:'PLAN'    },
+    ];
+  }
+
+  // Standard weekday
+  return [
+    { time:'08:00–10:00', subj:'IEE',  dur:'2h',    xp:100, type:'DEEP STUDY' },
+    { time:'10:00–10:15', subj:'BREAK',dur:'15 min', xp:0,   type:'BREAK'     },
+    { time:'10:15–11:45', subj:'CHEM', dur:'90 min', xp:75,  type:'DEEP STUDY'},
+    { time:'11:45–12:00', subj:'CS',   dur:'15 min', xp:15,  type:'STUDY'     },
+    { time:'01:00–02:30', subj:'AI',   dur:'90 min', xp:60,  type:'DEEP STUDY'},
+    { time:'02:30–04:00', subj:'PY',   dur:'90 min', xp:60,  type:'DEEP STUDY'},
+    { time:'04:00–05:00', subj:'MATH', dur:'1h',     xp:50,  type:'STUDY'     },
+    { time:'07:00–08:30', subj:'IEE',  dur:'90 min', xp:80,  type:'PYQ'      },
+    { time:'08:30–09:30', subj:'CHEM', dur:'1h',     xp:55,  type:'REVISION' },
+    { time:'09:30–10:15', subj:'AI',   dur:'45 min', xp:35,  type:'REVISION' },
+    { time:'10:15–11:00', subj:'MATH', dur:'45 min', xp:35,  type:'REVISION' },
+    { time:'11:00–11:30', subj:'CS',   dur:'30 min', xp:20,  type:'STUDY'    },
+  ];
+}
+
+// Day type
+function dayType(idx) {
+  if (idx >= 9) return 'cram';
+  const d = new Date(START); d.setDate(START.getDate()+idx);
+  return d.getDay() === 0 ? 'revision' : 'study';
+}
+
+// ============================================================
+// STATE
+// ============================================================
+let S = JSON.parse(localStorage.getItem('m10_v4') || '{}');
+if (!S.checks)    S.checks = {};
+if (!S.streak)    S.streak = { count:0, last:null };
+if (!S.pomoSess)  S.pomoSess = 0;
+const save = () => localStorage.setItem('m10_v4', JSON.stringify(S));
+
+let curDay = 0;
+let pomoSec = 45*60, pomoW = 45, pomoB = 10, pomoRunning = false, pomoInt = null, pomoBreak = false;
+
+// ============================================================
+// STARS
+// ============================================================
+(function(){
+  const c = document.getElementById('stars');
+  for (let i = 0; i < 130; i++) {
+    const s = document.createElement('div'); s.className='star';
+    const sz = Math.random()*2.5+.5;
+    s.style.cssText=`width:${sz}px;height:${sz}px;left:${Math.random()*100}%;top:${Math.random()*100}%;--d:${(Math.random()*4+2).toFixed(1)}s;--o:${(Math.random()*.7+.3).toFixed(2)};animation-delay:${(Math.random()*5).toFixed(1)}s`;
+    c.appendChild(s);
+  }
+})();
+
+// ============================================================
+// TIMELINE
+// ============================================================
+function buildTL() {
+  const sc = document.getElementById('tlScroll');
+  sc.innerHTML = '';
+  const today = new Date(); today.setHours(0,0,0,0);
+  for (let i = 0; i < TOTAL; i++) {
+    const d = new Date(START); d.setDate(START.getDate()+i); d.setHours(0,0,0,0);
+    const isTod = d.getTime()===today.getTime();
+    const isAct = i===curDay;
+    const isDone = d < today;
+    const type = dayType(i);
+    const node = document.createElement('div');
+    node.className=`day-node${isTod?' today':''}${isAct?' active':''}${isDone?' done':''}`;
+    node.onclick=()=>goToDay(i);
+    const mos=['Jun','Jul']; const m=mos[d.getMonth()-5]; const dn=d.getDate();
+    const tagClass={'study':'dt-study','cram':'dt-cram','revision':'dt-rev'}[type];
+    const tagTxt={'study':'STUDY','cram':'CRAM','revision':'REV'}[type];
+    node.innerHTML=`
+      <div class="dot">${i+1}</div>
+      <div class="dn-lbl">${m} ${dn}</div>
+      <div class="dn-type ${tagClass}">${tagTxt}</div>
+    `;
+    sc.appendChild(node);
+  }
+}
+
+// ============================================================
+// GO TO DAY
+// ============================================================
+function goToDay(idx) {
+  curDay = idx;
+  buildTL();
+  renderHero(idx);
+  renderBlocks(idx);
+  updateProgress(idx);
+  renderSubjGrid();
+  renderSGPA();
+  renderMarks();
+  loadQuote();
+  genBriefing(idx);
+  setTimeout(() => {
+    const n = document.querySelectorAll('.day-node');
+    if (n[idx]) n[idx].scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'});
+  }, 100);
+}
+
+// ============================================================
+// HERO
+// ============================================================
+function renderHero(idx) {
+  const d = new Date(START); d.setDate(START.getDate()+idx);
+  document.getElementById('heroDayNum').textContent = String(idx+1).padStart(2,'0');
+  document.getElementById('heroDate').textContent = d.toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  document.getElementById('dayCounter').textContent = `DAY ${idx+1} / ${TOTAL}`;
+  const today = new Date(); today.setHours(0,0,0,0);
+  const left = Math.max(0, Math.ceil((new Date('2025-06-30') - today) / 86400000));
+  document.getElementById('deadlineChip').textContent = `⌛ ${left} DAY${left!==1?'S':''} TO JUNE 30`;
+  const tag = document.getElementById('dayTag');
+  const type = dayType(idx);
+  const map = {
+    study:    {cls:'t-s', txt:'📚 DEEP STUDY DAY'},
+    revision: {cls:'t-r', txt:'🔄 REVISION DAY'},
+    cram:     {cls:'t-c', txt:'⚡ FINAL CRAM MODE'},
+  };
+  const t = map[type];
+  tag.className=`day-tag ${t.cls}`; tag.textContent=t.txt;
+}
+
+// ============================================================
+// BLOCKS
+// ============================================================
+function renderBlocks(idx) {
+  const blks = schedule(idx);
+  const key = `d${idx}`;
+  if (!S.checks[key]) S.checks[key] = [];
+  const el = document.getElementById('blocksEl');
+  el.innerHTML = '';
+  let totalXP = 0, earnedXP = 0;
+
+  blks.forEach((b, bi) => {
+    totalXP += b.xp;
+    const done = S.checks[key].includes(bi);
+    if (done) earnedXP += b.xp;
+    const isBreak = b.subj === 'BREAK' || b.subj === 'PLAN';
+    const col = SC[b.subj] || '#7c3aed';
+    const div = document.createElement('div'); div.className='blk';
+    div.innerHTML = `
+      <div class="blk-time">
+        <div class="blk-type-lbl">${b.type}</div>
+        <div class="blk-time-val">${b.time}</div>
+      </div>
+      <div class="blk-body">
+        <div class="blk-bar" style="background:${col}"></div>
+        <div class="blk-info">
+          <div class="blk-subj" style="color:${col}">${SN[b.subj]||b.subj}</div>
+        </div>
+        <div class="blk-dur">${b.dur}</div>
+        ${!isBreak && b.xp ? `<div class="blk-xp">+${b.xp}</div>` : ''}
+        ${!isBreak ? `<div class="chk${done?' done':''}" data-i="${bi}"></div>` : ''}
+      </div>
+    `;
+    if (!isBreak) {
+      div.querySelector('.chk').onclick = () => {
+        const arr = S.checks[key];
+        const pos = arr.indexOf(bi);
+        if (pos === -1) { arr.push(bi); notify(`+${b.xp} XP — ${SN[b.subj]} block complete! 🚀`); }
+        else arr.splice(pos, 1);
+        save(); renderBlocks(idx); updateProgress(idx); checkStreak();
+      };
+    }
+    el.appendChild(div);
+  });
+
+  const pct = totalXP > 0 ? Math.round(earnedXP/totalXP*100) : 0;
+  document.getElementById('xpFill').style.width = pct+'%';
+  document.getElementById('xpLbl').textContent = `${earnedXP} / ${totalXP} XP`;
+  document.getElementById('psXP').textContent = earnedXP;
+  document.getElementById('streakNum').textContent = S.streak.count;
+}
+
+// ============================================================
+// PROGRESS RING
+// ============================================================
+function updateProgress(idx) {
+  const blks = schedule(idx).filter(b => b.subj!=='BREAK' && b.subj!=='PLAN');
+  const key = `d${idx}`;
+  const done = (S.checks[key]||[]).length;
+  const total = blks.length;
+  const pct = total > 0 ? Math.round(done/total*100) : 0;
+  const circ = 251.3;
+  document.getElementById('ringEl').style.strokeDashoffset = circ-(circ*pct/100);
+  document.getElementById('ringPct').textContent = pct+'%';
+  document.getElementById('psBlocks').textContent = `${done}/${total}`;
+  document.getElementById('psHours').textContent = (done*0.75).toFixed(1)+'h';
+  let trk='🔴 Off Track', tc='var(--red)';
+  if (pct>=80){trk='🟢 On Track!';tc='var(--green)';}
+  else if (pct>=50){trk='🟡 Good';tc='var(--gold)';}
+  const t=document.getElementById('psTrack'); t.textContent=trk; t.style.color=tc;
+}
+
+// ============================================================
+// STREAK
+// ============================================================
+function checkStreak() {
+  const today = new Date().toDateString();
+  if (S.streak.last===today) return;
+  const yest=new Date(); yest.setDate(yest.getDate()-1);
+  S.streak.count = S.streak.last===yest.toDateString() ? S.streak.count+1 : 1;
+  S.streak.last=today; save();
+  document.getElementById('streakNum').textContent=S.streak.count;
+}
+
+// ============================================================
+// SUBJECTS GRID
+// ============================================================
+function renderSubjGrid() {
+  const g = document.getElementById('subjGrid'); g.innerHTML='';
+  const pcls=['','p1','p2','p3','p3','p4','p5'];
+  SUBJS.forEach(s => {
+    const needSEE = Math.max(0,90-s.cie);
+    const feasible = needSEE<=50;
+    const el=document.createElement('div'); el.className='sc';
+    el.style.setProperty('--sc-c',s.color);
+    el.innerHTML=`
+      <div class="sc-pri ${pcls[s.p]}">P${s.p}</div>
+      <div class="sc-name" style="color:${s.color}">${s.name}${s.cap?' (45m)':''}</div>
+      <div class="sc-cie">CIE: ${s.cie}/50</div>
+      <div class="sc-need" style="color:${feasible?'var(--green)':'var(--red)'}">SEE need: ${Math.min(50,needSEE)}/50${!feasible?' ⚠️':''}</div>
+      <div class="sc-pbar"><div class="sc-pfill" style="width:${(s.cie/50)*100}%"></div></div>
+    `;
+    g.appendChild(el);
+  });
+}
+
+// ============================================================
+// MARKS TABLE
+// ============================================================
+function renderMarks() {
+  const tb = document.getElementById('marksBody'); tb.innerHTML='';
+  SUBJS.forEach(s => {
+    const need=Math.max(0,90-s.cie);
+    const feasible=need<=50;
+    const maxT=s.cie+50;
+    let grade,gc;
+    if(maxT>=90){grade='O (10GP)';gc='gO';}
+    else if(maxT>=80){grade='A+ (9GP)';gc='gA';}
+    else{grade='A (8GP)';gc='gA';}
+    tb.innerHTML+=`
+      <tr>
+        <td style="color:${s.color};font-weight:600">${s.name}</td>
+        <td style="font-family:'JetBrains Mono',monospace">${s.cie}/50</td>
+        <td style="font-family:'JetBrains Mono',monospace;color:${feasible?'var(--green)':'var(--red)'}">${Math.min(50,need)}/50</td>
+        <td style="font-family:'JetBrains Mono',monospace">${maxT}%</td>
+        <td><span class="gp ${gc}">${grade}</span></td>
+      </tr>`;
+  });
+}
+
+// ============================================================
+// SGPA
+// ============================================================
+function renderSGPA() {
+  // Best case: IEE=A+(9GP), all others=O(10GP)
+  const gp={IEE:9,CHEM:10,AI:10,PY:10,MATH:10,CS:10};
+  let tc=0,ws=0;
+  const bars=document.getElementById('sgpaBars'); bars.innerHTML='';
+  SUBJS.forEach(s=>{
+    const g=gp[s.id]; tc+=s.credits; ws+=g*s.credits;
+    const pct=(g/10)*100;
+    bars.innerHTML+=`
+      <div class="sgb">
+        <div class="sgb-l" style="color:${s.color}">${s.id}</div>
+        <div class="sgb-t"><div class="sgb-f" style="width:${pct}%;background:${s.color}"></div></div>
+        <div class="sgb-v" style="color:${s.color}">GP ${g}</div>
+      </div>`;
+  });
+  const sgpa=(ws/tc).toFixed(2);
+  document.getElementById('sgpaVal').textContent=sgpa;
+}
+
+// ============================================================
+// QUOTES
+// ============================================================
+const QS=[
+  {t:"IEE CIE is 37. That's your battle scar — not your sentence. Max out every single mark in SEE.",a:"Mission 10 SGPA"},
+  {t:"12 days. 12 hours a day. 144 hours to transform your semester. Begin.",a:"Mission 10 SGPA"},
+  {t:"Chemistry, AI, Python — you're at 48–49 CIE. You're not playing catch-up. You're playing domination.",a:"Nova AI Coach"},
+  {t:"The student who scores 10 SGPA doesn't study harder in the last week. They started hard on day one.",a:"Nova AI Coach"},
+  {t:"Every time block you complete is a commitment to the version of yourself who gets the results.",a:"Mission 10 SGPA"},
+  {t:"June 30 is not a deadline. It's a launchpad. What you do between now and then decides the altitude.",a:"Mission 10 SGPA"},
+  {t:"Don't study to pass the exam. Study to own the subject. The marks follow.",a:"Nova AI Coach"},
+];
+function loadQuote(){
+  const q=QS[Math.floor(Math.random()*QS.length)];
+  document.getElementById('quoteEl').innerHTML=`<div class="qt-wrap"><div class="qt-t">"${q.t}"</div><div class="qt-a">— ${q.a}</div></div>`;
+}
+
+// ============================================================
+// TABS
+// ============================================================
+function switchTab(t){
+  ['schedule','marks','sgpa'].forEach(id=>{
+    document.getElementById(`tab-${id}`).style.display=id===t?'block':'none';
+  });
+  document.querySelectorAll('.tab-btn').forEach(b=>{
+    b.classList.toggle('active',b.getAttribute('onclick').includes(`'${t}'`));
+  });
+}
+
+// ============================================================
+// POMODORO
+// ============================================================
+function updatePomo(){
+  const m=Math.floor(pomoSec/60),s=pomoSec%60;
+  document.getElementById('pomoTime').textContent=`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+}
+function setPomo(w,b,btn){
+  pomoW=w;pomoB=b;pomoSec=w*60;pomoBreak=false;
+  if(pomoRunning){clearInterval(pomoInt);pomoRunning=false;
+    document.getElementById('pomoStart').textContent='START';
+    document.getElementById('pomoStart').classList.remove('act');}
+  updatePomo();
+  document.querySelectorAll('.pm-btn').forEach(x=>x.classList.remove('active'));
+  btn.classList.add('active');
+}
+function togglePomo(){
+  const btn=document.getElementById('pomoStart');
+  if(pomoRunning){clearInterval(pomoInt);pomoRunning=false;btn.textContent='START';btn.classList.remove('act');}
+  else{
+    pomoRunning=true;btn.textContent='PAUSE';btn.classList.add('act');
+    pomoInt=setInterval(()=>{
+      pomoSec--;updatePomo();
+      if(pomoSec<=0){
+        clearInterval(pomoInt);pomoRunning=false;btn.textContent='START';btn.classList.remove('act');
+        if(!pomoBreak){
+          S.pomoSess++;save();
+          document.getElementById('pomoSess').textContent=S.pomoSess;
+          notify(`🍅 Done! Take a ${pomoB}-min break.`);
+          pomoBreak=true;pomoSec=pomoB*60;
+        } else {notify('✅ Break over! Back to work.');pomoBreak=false;pomoSec=pomoW*60;}
+        updatePomo();
+      }
+    },1000);
+  }
+}
+function resetPomo(){
+  clearInterval(pomoInt);pomoRunning=false;pomoSec=pomoW*60;pomoBreak=false;
+  document.getElementById('pomoStart').textContent='START';
+  document.getElementById('pomoStart').classList.remove('act');
+  updatePomo();
+}
+
+// ============================================================
+// NOTIFICATIONS
+// ============================================================
+function notify(msg){
+  const n=document.getElementById('notif');
+  n.textContent=msg;n.classList.add('show');
+  setTimeout(()=>n.classList.remove('show'),3000);
+}
+
+// ============================================================
+// AI — NOVA
+// ============================================================
+async function genBriefing(idx){
+  const d=new Date(START);d.setDate(START.getDate()+idx);
+  const ds=d.toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long'});
+  const type=dayType(idx);
+  const done=(S.checks[`d${idx}`]||[]).length;
+  const el=document.getElementById('aiWelcome');
+  el.className='ai-box ld';el.textContent='Nova is analyzing your mission status...';
+  const prompt=`You are NOVA, an elite AI study coach. Student data:
+- Subjects: Maths (CIE:47), Chemistry (CIE:48), AI (CIE:49), IEE (CIE:37), Python (CIE:49), Communication Skills (CIE:49)
+- Target: 10 SGPA (O grade in all). Warning: IEE CIE=37, max possible = 87% (A+ best case).
+- Study window: June 19–30 (12 days), 12 hours/day (8AM-12PM, 1PM-5PM, 7PM-11PM)
+- Priority: IEE > Chemistry > AI = Python > Maths > Comm Skills (max 45 min/day only)
+- Today: ${ds}, Day ${idx+1}/12, Type: ${type.toUpperCase()}, Blocks done so far: ${done}
+- Streak: ${S.streak.count} days
+
+Write a sharp daily mission briefing (max 180 words, 3 paragraphs). No bullet points. Reference the specific day type and urgency. Be tactical about IEE. Be energizing.`;
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1000,messages:[{role:'user',content:prompt}]})});
+    const data=await r.json();
+    el.className='ai-box';
+    el.textContent=data.content?.map(c=>c.text||'').join('')||'Start your IEE block. Right now.';
+  }catch(e){
+    el.className='ai-box';
+    el.textContent=`Day ${idx+1}/12. ${type==='cram'?'Final cram mode activated.':type==='revision'?'Revision day — go deep, not wide.':'12 hours of deep work starts now.'} IEE first. Always IEE first. The 10 SGPA waits for no one.`;
+  }
+}
+
+async function askNova(){
+  const inp=document.getElementById('aiInp');
+  const q=inp.value.trim(); if(!q)return;
+  const btn=document.getElementById('aiBtn'); btn.disabled=true;
+  const resp=document.getElementById('aiResp');
+  resp.style.display='block';resp.style.color='var(--muted)';resp.style.fontStyle='italic';
+  resp.textContent='Nova thinking...'; inp.value='';
+  const prompt=`You are NOVA, AI study coach. Student: 12 days left (June 19-30), targeting 10 SGPA. IEE CIE=37 (critical, max 87%), Chemistry=48, AI=49, Python=49, Maths=47, Comm=49. Priority: IEE>Chemistry>AI=Python>Maths>Comm(45min cap). Day ${curDay+1}/12.
+Question: "${q}"
+Answer directly, specifically, powerfully. Under 160 words.`;
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1000,messages:[{role:'user',content:prompt}]})});
+    const data=await r.json();
+    resp.style.color='';resp.style.fontStyle='';
+    resp.textContent=data.content?.map(c=>c.text||'').join('')||'Keep going.';
+  }catch(e){
+    resp.style.color='';resp.style.fontStyle='';
+    resp.textContent='Nova is offline. But your mission isn\'t. Keep studying.';
+  }
+  btn.disabled=false;
+}
+
+// ============================================================
+// INIT
+// ============================================================
+(function init(){
+  const today=new Date(); today.setHours(0,0,0,0);
+  const diff=Math.floor((today-new Date(START))/86400000);
+  curDay=Math.max(0,Math.min(TOTAL-1,diff));
+  buildTL();
+  renderHero(curDay);
+  renderBlocks(curDay);
+  updateProgress(curDay);
+  renderSubjGrid();
+  renderMarks();
+  renderSGPA();
+  loadQuote();
+  updatePomo();
+  document.getElementById('pomoSess').textContent=S.pomoSess||0;
+  genBriefing(curDay);
+  setTimeout(()=>{
+    const n=document.querySelectorAll('.day-node');
+    if(n[curDay])n[curDay].scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'});
+  },300);
+  document.getElementById('aiInp').addEventListener('keydown',e=>{if(e.key==='Enter')askNova();});
+})();
+</script>
+</body>
+</html>
